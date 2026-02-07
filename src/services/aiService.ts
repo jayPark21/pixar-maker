@@ -14,9 +14,10 @@ export const generatePixarImage = async (imageUri: string, templatePrompt: strin
         // Skip text description - do direct image-to-image style transfer
         console.log("🎨 Starting direct Pixar style transformation...");
 
-        // 4. Use Gemini 2.5 Flash Image (working model)
+        // 4. Use Gemini 2.5 Flash Image (as requested)
         try {
             console.log("📡 Calling Gemini 2.5 Flash Image API...");
+            // Explicitly using Gemini 2.5 Flash Image
             const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`;
             const imagenResponse = await axios.post(imagenUrl, {
                 contents: [{
