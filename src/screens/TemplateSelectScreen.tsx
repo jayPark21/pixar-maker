@@ -11,7 +11,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'TemplateSelect'>;
 const { width } = Dimensions.get('window');
 // Calculate responsive item width based on container width constraint
 const CONTAINER_MAX_WIDTH = 500;
-const GAP = 12;
+const GAP = 10;
 
 export default function TemplateSelectScreen({ route, navigation }: Props) {
     const { capturedImage } = route.params;
@@ -100,22 +100,22 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     header: {
-        paddingVertical: 20,
+        paddingVertical: 12, // Reduced padding
         alignItems: 'center',
     },
     headerTitle: {
         color: 'white',
-        fontSize: 24,
+        fontSize: 20, // Slightly smaller text
         fontWeight: 'bold',
         letterSpacing: 0.5,
     },
     previewContainer: {
         width: '100%',
-        aspectRatio: 1, // Square preview looks cleaner
-        borderRadius: 24,
+        height: 250, // Fixed height instead of square aspect ratio
+        borderRadius: 20,
         overflow: 'hidden',
         backgroundColor: '#000',
-        marginBottom: 20,
+        marginBottom: 16,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -135,12 +135,12 @@ const styles = StyleSheet.create({
     selectionContainer: {
         flex: 1,
         paddingHorizontal: 20,
-        paddingBottom: 40,
+        paddingBottom: 20,
     },
     sectionTitle: {
         color: 'white',
-        fontSize: 18,
-        marginBottom: 16,
+        fontSize: 16,
+        marginBottom: 10,
         fontWeight: '700',
         marginLeft: 4,
     },
@@ -152,10 +152,10 @@ const styles = StyleSheet.create({
     },
     templateCard: {
         width: '48%', // Responsive percentage width
-        marginBottom: 12,
-        borderRadius: 16,
+        marginBottom: 8,
+        borderRadius: 12,
         backgroundColor: '#252525',
-        padding: 8,
+        padding: 6,
         alignItems: 'center',
         borderWidth: 2,
         borderColor: 'transparent',
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     generateButtonContainer: {
-        marginTop: 30, // More separation
+        marginTop: 16, // Reduced margin
         width: '100%',
         maxWidth: 500,
         alignSelf: 'center',
