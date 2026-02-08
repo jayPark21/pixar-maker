@@ -5,7 +5,15 @@
             "destination": "/index.html"
         }
     ],
-    "cleanUrls": true,
-    "framework": "create-react-app",
-    "outputDirectory": "dist"
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache, no-store, must-revalidate"
+                }
+            ]
+        }
+    ]
 }
