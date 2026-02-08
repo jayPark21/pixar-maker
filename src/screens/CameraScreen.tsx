@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Button } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera'; // Using modern CameraView
+import { View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../types';
 import { StatusBar } from 'expo-status-bar';
 
@@ -17,7 +18,7 @@ export default function CameraScreen() {
 
     if (!permission) {
         // Camera permissions are still loading.
-        return <View />;
+        return <View style={styles.container} />;
     }
 
     if (!permission.granted) {
@@ -40,7 +41,7 @@ export default function CameraScreen() {
             try {
                 const photo = await cameraRef.current.takePictureAsync({
                     quality: 0.8,
-                    base64: false, // We usually just need the URI
+                    base64: false,
                 });
 
                 if (photo) {
@@ -63,25 +64,27 @@ export default function CameraScreen() {
                 facing={facing}
                 ref={cameraRef}
             >
-                <View style={styles.buttonContainer}>
-                    {/* Top Controls */}
-                    <TouchableOpacity style={styles.flipButton} onPress={toggleCameraType}>
-                        <Text style={styles.text}>🔄</Text>
-                    </TouchableOpacity>
-
-                    {/* Bottom Controls */}
-                    <View style={styles.bottomControls}>
-                        <View style={styles.spacer} />
-                        <TouchableOpacity
-                            style={[styles.captureButton, isTakingPicture && styles.captureButtonActive]}
-                            onPress={takePicture}
-                            disabled={isTakingPicture}
-                        >
-                            <View style={styles.captureInner} />
+                <SafeAreaView style={styles.safeArea}>
+                    <View style={styles.buttonContainer}>
+                        {/* Top Controls */}
+                        <TouchableOpacity style={styles.flipButton} onPress={toggleCameraType}>
+                            <Text style={styles.text}>🔄</Text>
                         </TouchableOpacity>
-                        <View style={styles.spacer} />
+
+                        {/* Bottom Controls */}
+                        <View style={styles.bottomControls}>
+                            <View style={styles.spacer} />
+                            <TouchableOpacity
+                                style={[styles.captureButton, isTakingPicture && styles.captureButtonActive]}
+                                onPress={takePicture}
+                                disabled={isTakingPicture}
+                            >
+                                <View style={styles.captureInner} />
+                            </TouchableOpacity>
+                            <View style={styles.spacer} />
+                        </View>
                     </View>
-                </View>
+                </SafeAreaView>
             </CameraView>
         </View>
     );
@@ -91,7 +94,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#000',
-        justifyContent: 'center',
     },
     message: {
         textAlign: 'center',
@@ -100,6 +102,12 @@ const styles = StyleSheet.create({
     },
     camera: {
         flex: 1,
+        width: '100%',
+        height: '100%',
+    },
+    safeArea: {
+        flex: 1,
+        width: '100%',
     },
     buttonContainer: {
         flex: 1,
@@ -109,21 +117,19 @@ const styles = StyleSheet.create({
     },
     flipButton: {
         alignSelf: 'flex-end',
-        marginTop: 40,
-        padding: 10,
+        padding: 12,
         backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: 20,
+        borderRadius: 30,
+        marginTop: 10, // Small margin from safe area top
     },
     text: {
         fontSize: 24,
-        fontWeight: 'bold',
-        color: 'white',
     },
     bottomControls: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 40,
+        marginBottom: 20,
     },
     spacer: {
         flex: 1,
@@ -135,15 +141,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.3)',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 4,
+        borderColor: 'rgba(255,255,255,0.5)',
     },
     captureButtonActive: {
         backgroundColor: 'rgba(255, 255, 255, 0.5)',
         transform: [{ scale: 0.95 }]
     },
     captureInner: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
         backgroundColor: 'white',
     }
 });
