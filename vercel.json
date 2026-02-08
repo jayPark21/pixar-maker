@@ -1,12 +1,19 @@
 {
-    "devCommand": "expo start --web",
-    "buildCommand": "expo export -p web",
-    "outputDirectory": "dist",
-    "cleanUrls": true,
     "rewrites": [
         {
             "source": "/(.*)",
             "destination": "/index.html"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache, no-store, must-revalidate"
+                }
+            ]
         }
     ]
 }
