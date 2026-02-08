@@ -35,7 +35,7 @@ export const BACKGROUND_TEMPLATES: BackgroundTemplate[] = [
         id: 'seoul-night',
         name: '서울의 밤',
         color: '#1A237E',
-        thumbnail: require('../assets/thumb_seoul.jpg'),
+        thumbnail: require('../assets/thumb_seoul.png'),
         promptMod: 'Background is at the observation deck of Namsan Seoul Tower with a beautiful panoramic view of the sparkling city night lights.',
     },
 ];

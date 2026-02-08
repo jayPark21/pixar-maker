@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, SafeAreaView, Platform, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { PIXAR_PROMPT_TEMPLATE, BACKGROUND_TEMPLATES } from '../constants';
@@ -11,15 +11,10 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
-import { Alert } from 'react-native';
 
 export default function ResultScreen({ route, navigation }: Props) {
     const { capturedImage, templateId } = route.params;
     const [loading, setLoading] = useState(true);
-
-    // In a real app, this would be the URL returned from the AI API
-    // For MVP, we are just showing the original image as a placeholder or implementing a dummy "filter" view
-    // But to simulate the "Experience", we will pretend we got a result.
 
     const template = BACKGROUND_TEMPLATES.find(t => t.id === templateId);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -43,17 +38,34 @@ export default function ResultScreen({ route, navigation }: Props) {
         navigation.navigate('Camera');
     };
 
-    const saveImage = async () => {
-        if (!generatedImage) return null;
+    const handleSave = async () => {
+        if (!generatedImage) return;
+
+        if (Platform.OS === 'web') {
+            try {
+                // Web specific download logic
+                const link = document.createElement('a');
+                link.href = generatedImage;
+                link.download = `pixar_${templateId}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                Alert.alert("Success", "Starting download...");
+            } catch (error) {
+                console.error("Web save error:", error);
+                Alert.alert("Error", "Failed to download image.");
+            }
+            return;
+        }
 
         try {
             const { status } = await MediaLibrary.requestPermissionsAsync(true);
             if (status !== 'granted') {
                 Alert.alert("Permission required", "Please allow access to save photos.");
-                return null;
+                return;
             }
 
-            const base64Code = generatedImage.split('data:image/png;base64,')[1];
+            const base64Code = generatedImage.split('data:image/png;base64,')[1] || generatedImage;
             const filename = FileSystem.documentDirectory + "pixar_style.png";
 
             await FileSystem.writeAsStringAsync(filename, base64Code, {
@@ -61,26 +73,52 @@ export default function ResultScreen({ route, navigation }: Props) {
             });
 
             await MediaLibrary.createAssetAsync(filename);
-            return filename;
-
+            Alert.alert("Saved!", "Image saved to your gallery.");
         } catch (error) {
             console.error(error);
             Alert.alert("Error", "Failed to save image.");
-            return null;
-        }
-    };
-
-    const handleSave = async () => {
-        const filename = await saveImage();
-        if (filename) {
-            Alert.alert("Saved!", "Image saved to your gallery.");
         }
     };
 
     const handleShare = async () => {
-        const filename = await saveImage();
-        if (filename && await Sharing.isAvailableAsync()) {
-            await Sharing.shareAsync(filename);
+        if (!generatedImage) return;
+
+        if (Platform.OS === 'web') {
+            // Check for Web Share API support (navigator.share)
+            if (navigator.share) {
+                try {
+                    // Create a blob from base64 to share as a file if possible
+                    const response = await fetch(generatedImage);
+                    const blob = await response.blob();
+                    const file = new File([blob], 'pixar_photo.png', { type: 'image/png' });
+
+                    await navigator.share({
+                        files: [file],
+                        title: 'Look at my Pixar character!',
+                        text: 'Created with Pixar Maker 🎨',
+                    });
+                } catch (error) {
+                    console.log('Share failed:', error);
+                    // Fallback to simple link sharing or just info
+                    Alert.alert("Share", "Sharing not fully supported on this web browser, please use the Save button.");
+                }
+            } else {
+                Alert.alert("Share", "Web Sharing API is not supported in this browser. Please use the Save button to download.");
+            }
+            return;
+        }
+
+        try {
+            // Native Share
+            if (await Sharing.isAvailableAsync()) {
+                const base64Code = generatedImage.split('data:image/png;base64,')[1] || generatedImage;
+                const filename = FileSystem.documentDirectory + "pixar_share.png";
+                await FileSystem.writeAsStringAsync(filename, base64Code, { encoding: 'base64' });
+                await Sharing.shareAsync(filename);
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "Failed to share image.");
         }
     };
 

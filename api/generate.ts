@@ -18,8 +18,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        // Use gemini-2.0-flash-exp (as requested by user)
-        const MODEL_NAME = 'gemini-2.0-flash-exp';
+        // Use gemini-2.5-flash-image (Optimized for image-to-image as requested)
+        const MODEL_NAME = 'gemini-2.5-flash-image';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
 
         console.log(`📡 Server Proxy: Calling Gemini API for model ${MODEL_NAME}`);

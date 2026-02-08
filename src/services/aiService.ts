@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// Use environment variables (expo-constants). 
-// Note: In web builds, EXPO_PUBLIC_ prefix makes them available in the JS bundle.
-const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+// Note: We now use a secure server proxy (/api/generate) to protect our API Key.
+
 
 export const generatePixarImage = async (imageUri: string, templatePrompt: string): Promise<string> => {
     try {
@@ -22,13 +21,12 @@ export const generatePixarImage = async (imageUri: string, templatePrompt: strin
             });
         }
 
-        // Direct Image-to-Image Generation as requested by user.
-        // Restricting key usage via Google Cloud Console Referrer is recommended for security.
+        // Secure Proxy Call: Using our Vercel Serverless Function
         try {
-            console.log(`📡 Calling gemini-2.0-flash-exp API directly...`);
-            const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+            console.log(`📡 Calling secure server proxy (/api/generate)...`);
 
-            const genResponse = await axios.post(genUrl, {
+            // We call our OWN backend, which holds the API Key safely.
+            const proxyResponse = await axios.post('/api/generate', {
                 contents: [{
                     parts: [
                         { text: `Turn this person into a 3D Pixar-style character. ${templatePrompt}. Output ONLY the image data.` },
@@ -45,20 +43,21 @@ export const generatePixarImage = async (imageUri: string, templatePrompt: strin
                 timeout: 60000
             });
 
-            // Extract image data
-            const generatedBase64 = genResponse.data?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData)?.inlineData?.data;
+            // Extract image data from Gemini response via Proxy
+            const generatedBase64 = proxyResponse.data?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData)?.inlineData?.data;
 
             if (generatedBase64) {
-                console.log("✅ Image Generation Successful!");
+                console.log("✅ Image Generation Successful (via Proxy)!");
                 return `data:image/png;base64,${generatedBase64}`;
             }
 
-            console.error("❌ No image data in response:", JSON.stringify(genResponse.data));
-            throw new Error("No image data in response");
+            console.error("❌ No image data in response:", JSON.stringify(proxyResponse.data));
+            throw new Error("No image data in server response");
 
         } catch (genError: any) {
-            console.error("❌ Direct API Generation failed:", genError.response?.data || genError.message);
-            throw genError;
+            const errorMsg = genError.response?.data?.error?.message || genError.message;
+            console.error("❌ Proxy API Generation failed:", errorMsg);
+            throw new Error(errorMsg);
         }
 
     } catch (error) {

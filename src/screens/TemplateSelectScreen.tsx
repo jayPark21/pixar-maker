@@ -106,11 +106,12 @@ const styles = StyleSheet.create({
     },
     previewContainer: {
         width: '100%',
-        height: 220, // further reduced for small screens
+        height: 320, // Increased to fill more space
         borderRadius: 20,
         overflow: 'hidden',
         backgroundColor: '#000',
-        marginBottom: 12,
+        marginBottom: 20, // Increased margin
+
         shadowColor: "#000",
         shadowOffset: {
             width: 0,

@@ -6,6 +6,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../types';
 import { StatusBar } from 'expo-status-bar';
+import { Audio as ExpoAudio } from 'expo-av';
+
+const SHUTTER_SOUND = require('../../assets/shutter.mp3');
+
+
 
 type CameraScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Camera'>;
 
@@ -39,9 +44,27 @@ export default function CameraScreen() {
         setTimeout(() => setIsCameraReady(true), 500);
     }
 
+    const playShutterSound = async () => {
+        try {
+            const { sound } = await ExpoAudio.Sound.createAsync(SHUTTER_SOUND);
+            await sound.playAsync();
+            // Automatically unload after playing
+            sound.setOnPlaybackStatusUpdate((status) => {
+                if (status.isLoaded && status.didJustFinish) {
+                    sound.unloadAsync();
+                }
+            });
+        } catch (error) {
+            console.log("Shutter sound failed:", error);
+        }
+    };
+
     const takePicture = async () => {
         if (cameraRef.current && !isTakingPicture) {
             setIsTakingPicture(true);
+            // Play shutter sound immediately
+            playShutterSound();
+
             try {
                 const photo = await cameraRef.current.takePictureAsync({
                     quality: 0.8,
