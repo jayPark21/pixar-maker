@@ -28,7 +28,7 @@ export const BACKGROUND_TEMPLATES: BackgroundTemplate[] = [
         id: 'k-sauna',
         name: '찜질방',
         color: '#8D6E63',
-        thumbnail: require('../assets/thumb_sauna.jpg'),
+        thumbnail: require('../assets/thumb_sauna_v2.jpg'),
         promptMod: 'Background is inside a cozy wooden room with warm lighting. The character is wearing a white fluffy head-wrap with two cute round buns on the sides (resembling sheep ears), and wearing comfy orange loungewear t-shirt and pants.',
     },
     {
