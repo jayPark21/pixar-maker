@@ -37,7 +37,7 @@ export default function CameraScreen() {
         setIsCameraReady(false);
         setFacing(current => (current === 'back' ? 'front' : 'back'));
         // Small delay to ensure clean unmount/remount on web
-        setTimeout(() => setIsCameraReady(true), 100);
+        setTimeout(() => setIsCameraReady(true), 500);
     }
 
     const takePicture = async () => {
