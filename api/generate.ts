@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
 
+// Deployment trigger: 2026-02-08T11:25:00
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 1. Only allow POST requests
     if (req.method !== 'POST') {
