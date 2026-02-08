@@ -28,7 +28,7 @@ export default function TemplateSelectScreen({ route, navigation }: Props) {
         <SafeAreaView style={styles.container}>
             <StatusBar style="light" />
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Select Your Vibe ✨</Text>
+                <Text style={styles.headerTitle}>Select Background 🎨</Text>
             </View>
 
             <View style={styles.contentWrapper}>
@@ -82,6 +82,7 @@ export default function TemplateSelectScreen({ route, navigation }: Props) {
                             <Text style={styles.generateButtonText}>✨ Make it Pixar!</Text>
                         </LinearGradient>
                     </TouchableOpacity>
+                    <Text style={styles.versionText}>v1.2 (Latest)</Text>
                 </View>
             </View>
         </SafeAreaView>
@@ -221,5 +222,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         letterSpacing: 1,
+    },
+    versionText: {
+        color: '#666',
+        textAlign: 'center',
+        paddingVertical: 10,
+        fontSize: 12,
     },
 });
