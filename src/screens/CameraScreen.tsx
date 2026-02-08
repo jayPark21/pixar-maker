@@ -15,6 +15,7 @@ export default function CameraScreen() {
     const cameraRef = useRef<CameraView>(null);
     const navigation = useNavigation<CameraScreenNavigationProp>();
     const [isTakingPicture, setIsTakingPicture] = useState(false);
+    const [isCameraReady, setIsCameraReady] = useState(true);
 
     if (!permission) {
         // Camera permissions are still loading.
@@ -30,8 +31,6 @@ export default function CameraScreen() {
             </View>
         );
     }
-
-    const [isCameraReady, setIsCameraReady] = useState(true);
 
     function toggleCameraType() {
         setIsCameraReady(false);
