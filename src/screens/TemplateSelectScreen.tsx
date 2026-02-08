@@ -11,7 +11,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'TemplateSelect'>;
 const { width } = Dimensions.get('window');
 // Calculate responsive item width based on container width constraint
 const CONTAINER_MAX_WIDTH = 500;
-const GAP = 10;
+const GAP = 8;
 
 export default function TemplateSelectScreen({ route, navigation }: Props) {
     const { capturedImage } = route.params;
@@ -38,8 +38,6 @@ export default function TemplateSelectScreen({ route, navigation }: Props) {
                     </View>
 
                     <View style={styles.selectionContainer}>
-                        <Text style={styles.sectionTitle}>Choose Background</Text>
-
                         <View style={styles.gridContainer}>
                             {BACKGROUND_TEMPLATES.map((template) => (
                                 <TouchableOpacity
@@ -81,7 +79,7 @@ export default function TemplateSelectScreen({ route, navigation }: Props) {
                                 <Text style={styles.generateButtonText}>✨ Make it Pixar!</Text>
                             </LinearGradient>
                         </TouchableOpacity>
-                        <Text style={styles.versionText}>v1.4 (Scrollable)</Text>
+                        <Text style={styles.versionText}>v1.5 (Clean)</Text>
                     </View>
                 </View>
             </ScrollView>
