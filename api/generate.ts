@@ -8,9 +8,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const { contents, generationConfig } = req.body;
-    const API_KEY = process.env.GEMINI_API_KEY;
+    // Check both standard and Expo-prefixed keys for maximum compatibility
+    const API_KEY = process.env.GEMINI_API_KEY || process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
     if (!API_KEY) {
+        console.error('❌ API Key missing in environment variables');
         return res.status(500).json({ error: 'API Key not configured on server' });
     }
 
