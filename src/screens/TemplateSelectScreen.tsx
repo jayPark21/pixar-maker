@@ -27,9 +27,7 @@ export default function TemplateSelectScreen({ route, navigation }: Props) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar style="light" />
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Select Background 🎨</Text>
-            </View>
+            <View style={styles.headerSpacer} />
 
             <View style={styles.contentWrapper}>
                 <View style={styles.previewContainer}>
@@ -82,7 +80,7 @@ export default function TemplateSelectScreen({ route, navigation }: Props) {
                             <Text style={styles.generateButtonText}>✨ Make it Pixar!</Text>
                         </LinearGradient>
                     </TouchableOpacity>
-                    <Text style={styles.versionText}>v1.2 (Latest)</Text>
+                    <Text style={styles.versionText}>v1.3 (Compact)</Text>
                 </View>
             </View>
         </SafeAreaView>
@@ -99,23 +97,16 @@ const styles = StyleSheet.create({
         maxWidth: 500, // Constrain width on larger screens (web)
         alignSelf: 'center',
     },
-    header: {
-        paddingVertical: 12, // Reduced padding
-        alignItems: 'center',
-    },
-    headerTitle: {
-        color: 'white',
-        fontSize: 20, // Slightly smaller text
-        fontWeight: 'bold',
-        letterSpacing: 0.5,
+    headerSpacer: {
+        height: 10,
     },
     previewContainer: {
         width: '100%',
-        height: 250, // Fixed height instead of square aspect ratio
+        height: 220, // further reduced for small screens
         borderRadius: 20,
         overflow: 'hidden',
         backgroundColor: '#000',
-        marginBottom: 16,
+        marginBottom: 12,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -202,13 +193,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     generateButtonContainer: {
-        marginTop: 16, // Reduced margin
+        marginTop: 10,
+        marginBottom: 10,
         width: '100%',
         maxWidth: 500,
         alignSelf: 'center',
     },
     generateButton: {
-        paddingVertical: 18,
+        paddingVertical: 16,
         borderRadius: 30,
         alignItems: 'center',
         shadowColor: '#E94057',

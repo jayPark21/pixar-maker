@@ -60,6 +60,7 @@ export default function CameraScreen() {
         <View style={styles.container}>
             <StatusBar style="light" />
             <CameraView
+                key={facing}
                 style={styles.camera}
                 facing={facing}
                 ref={cameraRef}
