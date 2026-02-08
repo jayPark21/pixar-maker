@@ -31,8 +31,13 @@ export default function CameraScreen() {
         );
     }
 
+    const [isCameraReady, setIsCameraReady] = useState(true);
+
     function toggleCameraType() {
+        setIsCameraReady(false);
         setFacing(current => (current === 'back' ? 'front' : 'back'));
+        // Small delay to ensure clean unmount/remount on web
+        setTimeout(() => setIsCameraReady(true), 100);
     }
 
     const takePicture = async () => {
@@ -59,34 +64,40 @@ export default function CameraScreen() {
     return (
         <View style={styles.container}>
             <StatusBar style="light" />
-            <CameraView
-                key={facing}
-                style={styles.camera}
-                facing={facing}
-                ref={cameraRef}
-            >
-                <SafeAreaView style={styles.safeArea}>
-                    <View style={styles.buttonContainer}>
-                        {/* Top Controls */}
-                        <TouchableOpacity style={styles.flipButton} onPress={toggleCameraType}>
-                            <Text style={styles.text}>🔄</Text>
-                        </TouchableOpacity>
-
-                        {/* Bottom Controls */}
-                        <View style={styles.bottomControls}>
-                            <View style={styles.spacer} />
-                            <TouchableOpacity
-                                style={[styles.captureButton, isTakingPicture && styles.captureButtonActive]}
-                                onPress={takePicture}
-                                disabled={isTakingPicture}
-                            >
-                                <View style={styles.captureInner} />
+            {isCameraReady ? (
+                <CameraView
+                    key={facing}
+                    style={styles.camera}
+                    facing={facing}
+                    ref={cameraRef}
+                >
+                    <SafeAreaView style={styles.safeArea}>
+                        <View style={styles.buttonContainer}>
+                            {/* Top Controls */}
+                            <TouchableOpacity style={styles.flipButton} onPress={toggleCameraType}>
+                                <Text style={styles.text}>🔄</Text>
                             </TouchableOpacity>
-                            <View style={styles.spacer} />
+
+                            {/* Bottom Controls */}
+                            <View style={styles.bottomControls}>
+                                <View style={styles.spacer} />
+                                <TouchableOpacity
+                                    style={[styles.captureButton, isTakingPicture && styles.captureButtonActive]}
+                                    onPress={takePicture}
+                                    disabled={isTakingPicture}
+                                >
+                                    <View style={styles.captureInner} />
+                                </TouchableOpacity>
+                                <View style={styles.spacer} />
+                            </View>
                         </View>
-                    </View>
-                </SafeAreaView>
-            </CameraView>
+                    </SafeAreaView>
+                </CameraView>
+            ) : (
+                <View style={styles.loadingContainer}>
+                    <Text style={styles.text}>Switching...</Text>
+                </View>
+            )}
         </View>
     );
 }
@@ -154,5 +165,11 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 30,
         backgroundColor: 'white',
+    },
+    loadingContainer: {
+        flex: 1,
+        backgroundColor: '#000',
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 });

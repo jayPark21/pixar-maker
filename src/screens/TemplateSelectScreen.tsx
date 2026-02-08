@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { BACKGROUND_TEMPLATES } from '../constants';
@@ -29,60 +29,62 @@ export default function TemplateSelectScreen({ route, navigation }: Props) {
             <StatusBar style="light" />
             <View style={styles.headerSpacer} />
 
-            <View style={styles.contentWrapper}>
-                <View style={styles.previewContainer}>
-                    <Image source={{ uri: capturedImage }} style={styles.previewImage} resizeMode="cover" />
-                    {/* Overlay the selected color slightly to preview vibe */}
-                    <View style={[styles.overlay, { backgroundColor: BACKGROUND_TEMPLATES.find(t => t.id === selectedTemplateId)?.color, opacity: 0.15 }]} />
-                </View>
-
-                <View style={styles.selectionContainer}>
-                    <Text style={styles.sectionTitle}>Choose Background</Text>
-
-                    <View style={styles.gridContainer}>
-                        {BACKGROUND_TEMPLATES.map((template) => (
-                            <TouchableOpacity
-                                key={template.id}
-                                style={[
-                                    styles.templateCard,
-                                    selectedTemplateId === template.id && styles.templateCardSelected
-                                ]}
-                                onPress={() => setSelectedTemplateId(template.id)}
-                                activeOpacity={0.8}
-                            >
-                                <View style={styles.thumbnailContainer}>
-                                    <Image
-                                        source={template.thumbnail}
-                                        style={styles.thumbnail}
-                                        resizeMode="cover"
-                                    />
-                                    {selectedTemplateId === template.id && (
-                                        <View style={styles.selectedOverlay}>
-                                            <Text style={styles.checkMark}>✓</Text>
-                                        </View>
-                                    )}
-                                </View>
-                                <Text style={[
-                                    styles.templateName,
-                                    selectedTemplateId === template.id && styles.templateNameSelected
-                                ]}>{template.name}</Text>
-                            </TouchableOpacity>
-                        ))}
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <View style={styles.contentWrapper}>
+                    <View style={styles.previewContainer}>
+                        <Image source={{ uri: capturedImage }} style={styles.previewImage} resizeMode="cover" />
+                        {/* Overlay the selected color slightly to preview vibe */}
+                        <View style={[styles.overlay, { backgroundColor: BACKGROUND_TEMPLATES.find(t => t.id === selectedTemplateId)?.color, opacity: 0.15 }]} />
                     </View>
 
-                    <TouchableOpacity style={styles.generateButtonContainer} onPress={handleGenerate}>
-                        <LinearGradient
-                            colors={['#8A2387', '#E94057', '#F27121']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            style={styles.generateButton}
-                        >
-                            <Text style={styles.generateButtonText}>✨ Make it Pixar!</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                    <Text style={styles.versionText}>v1.3 (Compact)</Text>
+                    <View style={styles.selectionContainer}>
+                        <Text style={styles.sectionTitle}>Choose Background</Text>
+
+                        <View style={styles.gridContainer}>
+                            {BACKGROUND_TEMPLATES.map((template) => (
+                                <TouchableOpacity
+                                    key={template.id}
+                                    style={[
+                                        styles.templateCard,
+                                        selectedTemplateId === template.id && styles.templateCardSelected
+                                    ]}
+                                    onPress={() => setSelectedTemplateId(template.id)}
+                                    activeOpacity={0.8}
+                                >
+                                    <View style={styles.thumbnailContainer}>
+                                        <Image
+                                            source={template.thumbnail}
+                                            style={styles.thumbnail}
+                                            resizeMode="cover"
+                                        />
+                                        {selectedTemplateId === template.id && (
+                                            <View style={styles.selectedOverlay}>
+                                                <Text style={styles.checkMark}>✓</Text>
+                                            </View>
+                                        )}
+                                    </View>
+                                    <Text style={[
+                                        styles.templateName,
+                                        selectedTemplateId === template.id && styles.templateNameSelected
+                                    ]}>{template.name}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <TouchableOpacity style={styles.generateButtonContainer} onPress={handleGenerate}>
+                            <LinearGradient
+                                colors={['#8A2387', '#E94057', '#F27121']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.generateButton}
+                            >
+                                <Text style={styles.generateButtonText}>✨ Make it Pixar!</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                        <Text style={styles.versionText}>v1.4 (Scrollable)</Text>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -96,6 +98,10 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 500, // Constrain width on larger screens (web)
         alignSelf: 'center',
+    },
+    scrollContent: {
+        flexGrow: 1,
+        paddingBottom: 40,
     },
     headerSpacer: {
         height: 10,
