@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-// IMPORTANT: We no longer use EXPO_PUBLIC_GEMINI_API_KEY on the client side for production.
-// Instead, we use our secure backend proxy located at /api/generate
+// Use environment variables (expo-constants). 
+// Note: In web builds, EXPO_PUBLIC_ prefix makes them available in the JS bundle.
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 export const generatePixarImage = async (imageUri: string, templatePrompt: string): Promise<string> => {
     try {
-        console.log("🎨 Starting Pixar generation via Secure Proxy...");
+        console.log("🎨 Starting Direct Pixar generation (v2.3 optimized)...");
 
         let base64 = '';
         if (imageUri.startsWith('data:image')) {
@@ -21,41 +22,48 @@ export const generatePixarImage = async (imageUri: string, templatePrompt: strin
             });
         }
 
+        // Direct Image-to-Image Generation as requested by user.
+        // Restricting key usage via Google Cloud Console Referrer is recommended for security.
         try {
-            // Use our own backend API instead of calling Google directly from the browser
-            // This keeps the API key hidden on the server.
-            console.log("📡 Calling Server Proxy /api/generate...");
+            console.log(`📡 Calling gemini-2.0-flash-exp API directly...`);
+            const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
-            const response = await axios.post('/api/generate', {
+            const genResponse = await axios.post(genUrl, {
                 contents: [{
                     parts: [
-                        { text: `Turn this person into a 3D Pixar-style character. ${templatePrompt}. Output only the image.` },
+                        { text: `Turn this person into a 3D Pixar-style character. ${templatePrompt}. Output ONLY the image data.` },
                         { inline_data: { mime_type: "image/jpeg", data: base64 } }
                     ]
                 }],
                 generationConfig: {
                     responseModalities: ["IMAGE"]
                 }
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                timeout: 60000
             });
 
-            // The proxy returns the same structure as Gemini API
-            const base64Image = response.data?.candidates?.[0]?.content?.parts?.find((part: any) => part.inlineData)?.inlineData?.data;
+            // Extract image data
+            const generatedBase64 = genResponse.data?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData)?.inlineData?.data;
 
-            if (base64Image) {
-                console.log("✅ Secure Image Generation Successful!");
-                return `data:image/png;base64,${base64Image}`;
-            } else {
-                console.error("❌ No image data in proxy response");
-                throw new Error("No image data in response");
+            if (generatedBase64) {
+                console.log("✅ Image Generation Successful!");
+                return `data:image/png;base64,${generatedBase64}`;
             }
-        } catch (proxyError: any) {
-            console.error("⚠️ Proxy Error:", proxyError.response?.data || proxyError.message);
-            throw proxyError;
+
+            console.error("❌ No image data in response:", JSON.stringify(genResponse.data));
+            throw new Error("No image data in response");
+
+        } catch (genError: any) {
+            console.error("❌ Direct API Generation failed:", genError.response?.data || genError.message);
+            throw genError;
         }
 
     } catch (error) {
-        console.error("🚨 AI Generation Error (Proxy):", error);
-        // Fallback image (3D Boy)
+        console.error("🚨 AI Generation Error:", error);
+        // Fallback to the default 3D boy image
         return 'https://img.freepik.com/free-photo/3d-illustration-cute-boy-with-glasses_1142-41408.jpg';
     }
 };
