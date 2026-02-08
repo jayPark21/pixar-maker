@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Use environment variables (expo-constants) or a backend proxy.
-const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+// IMPORTANT: We no longer use EXPO_PUBLIC_GEMINI_API_KEY on the client side for production.
+// Instead, we use our secure backend proxy located at /api/generate
 
 export const generatePixarImage = async (imageUri: string, templatePrompt: string): Promise<string> => {
     try {
-        console.log("🎨 Starting Pixar generation...");
+        console.log("🎨 Starting Pixar generation via Secure Proxy...");
 
         let base64 = '';
         if (imageUri.startsWith('data:image')) {
@@ -21,15 +21,12 @@ export const generatePixarImage = async (imageUri: string, templatePrompt: strin
             });
         }
 
-        // Direct Image-to-Image Generation (as requested by user)
-        // Using 'gemini-2.0-flash-exp' which supports direct image generation.
-        const MODEL_NAME = 'gemini-2.0-flash-exp';
-
         try {
-            console.log(`📡 Calling ${MODEL_NAME} API for direct image generation...`);
-            const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`;
+            // Use our own backend API instead of calling Google directly from the browser
+            // This keeps the API key hidden on the server.
+            console.log("📡 Calling Server Proxy /api/generate...");
 
-            const genResponse = await axios.post(genUrl, {
+            const response = await axios.post('/api/generate', {
                 contents: [{
                     parts: [
                         { text: `Turn this person into a 3D Pixar-style character. ${templatePrompt}. Output only the image.` },
@@ -39,58 +36,26 @@ export const generatePixarImage = async (imageUri: string, templatePrompt: strin
                 generationConfig: {
                     responseModalities: ["IMAGE"]
                 }
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                timeout: 60000
             });
 
-            // Extract image data
-            const generatedBase64 = genResponse.data?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData)?.inlineData?.data;
+            // The proxy returns the same structure as Gemini API
+            const base64Image = response.data?.candidates?.[0]?.content?.parts?.find((part: any) => part.inlineData)?.inlineData?.data;
 
-            if (generatedBase64) {
-                console.log("✅ Image Generation Successful!");
-                return `data:image/png;base64,${generatedBase64}`;
+            if (base64Image) {
+                console.log("✅ Secure Image Generation Successful!");
+                return `data:image/png;base64,${base64Image}`;
+            } else {
+                console.error("❌ No image data in proxy response");
+                throw new Error("No image data in response");
             }
-
-            console.error("❌ No image data in Gemini response:", JSON.stringify(genResponse.data));
-            throw new Error("No image data in response");
-
-        } catch (genError: any) {
-            console.error("❌ Generation failed:", genError.response?.data || genError.message);
-            throw genError;
+        } catch (proxyError: any) {
+            console.error("⚠️ Proxy Error:", proxyError.response?.data || proxyError.message);
+            throw proxyError;
         }
 
     } catch (error) {
-        console.error("🚨 Final Fallback Triggered:", error);
+        console.error("🚨 AI Generation Error (Proxy):", error);
         // Fallback image (3D Boy)
         return 'https://img.freepik.com/free-photo/3d-illustration-cute-boy-with-glasses_1142-41408.jpg';
     }
 };
-
-// Kept for reference but not currently used in the direct flow
-async function analyzeImageWithGemini(base64Image: string): Promise<string | null> {
-    if (!GEMINI_API_KEY) {
-        console.warn("⚠️ No Gemini API Key set.");
-        return null;
-    }
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-    const body = {
-        contents: [{
-            parts: [
-                { text: "Analyze this person..." },
-                { inline_data: { mime_type: "image/jpeg", data: base64Image } }
-            ]
-        }]
-    };
-
-    try {
-        const response = await axios.post(url, body, { timeout: 10000 });
-        return response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
-    } catch (error) {
-        return null;
-    }
-}
