@@ -1,19 +1,15 @@
 {
-    "rewrites": [
+    "version": 2,
+    "builds": [
         {
-            "source": "/(.*)",
-            "destination": "/index.html"
+            "src": "dist/index.html",
+            "use": "@vercel/static"
         }
     ],
-    "headers": [
+    "routes": [
         {
-            "source": "/(.*)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "no-cache, no-store, must-revalidate"
-                }
-            ]
+            "src": "/(.*)",
+            "dest": "/dist/index.html"
         }
     ]
 }
