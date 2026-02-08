@@ -1,15 +1,10 @@
 {
-    "version": 2,
-    "builds": [
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "rewrites": [
         {
-            "src": "dist/index.html",
-            "use": "@vercel/static"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "/dist/index.html"
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ]
 }
